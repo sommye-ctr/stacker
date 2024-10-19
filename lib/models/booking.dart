@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:stacker/models/stack.dart';
 import 'package:stacker/utils/date_helper.dart';
 
 class Booking {
@@ -11,6 +12,8 @@ class Booking {
   String stackId;
   String status;
   DateTime creationTime;
+
+  StackModel stacks;
   Booking({
     required this.id,
     required this.token,
@@ -19,6 +22,7 @@ class Booking {
     required this.stackId,
     required this.status,
     required this.creationTime,
+    required this.stacks,
   });
 
   Booking copyWith({
@@ -29,6 +33,7 @@ class Booking {
     String? stackId,
     String? status,
     DateTime? creationTime,
+    StackModel? stacks,
   }) {
     return Booking(
       id: id ?? this.id,
@@ -38,6 +43,7 @@ class Booking {
       stackId: stackId ?? this.stackId,
       status: status ?? this.status,
       creationTime: creationTime ?? this.creationTime,
+      stacks: stacks ?? this.stacks,
     );
   }
 
@@ -50,6 +56,7 @@ class Booking {
       'stackId': stackId,
       'status': status,
       'creationTime': creationTime,
+      'stacks': stacks,
     };
   }
 
@@ -63,6 +70,7 @@ class Booking {
       stackId: map['stack_id'] ?? '',
       status: map['status'] ?? '',
       creationTime: DateTime.parse(map['time_creation']),
+      stacks: StackModel.fromMap(map['stacks']),
     );
   }
 
@@ -87,7 +95,8 @@ class Booking {
         other.userId == userId &&
         other.stackId == stackId &&
         other.status == status &&
-        other.creationTime == creationTime;
+        other.creationTime == creationTime &&
+        other.stacks == stacks;
   }
 
   @override
@@ -98,6 +107,7 @@ class Booking {
         userId.hashCode ^
         stackId.hashCode ^
         status.hashCode ^
-        creationTime.hashCode;
+        creationTime.hashCode ^
+        stacks.hashCode;
   }
 }

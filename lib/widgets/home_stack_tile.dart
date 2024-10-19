@@ -48,7 +48,7 @@ class HomeStackTile extends StatelessWidget {
           ),
           image: RoundedImage(
             image: stack.image,
-            width: ScreenSize.getPercentOfWidth(context, 1),
+            width: ScreenSize.getPercentOfWidth(context, 0.9),
             ratio: Style.stackTileImageRatio,
           ),
         ),

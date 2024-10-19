@@ -135,10 +135,54 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
   Widget _buildButton() {
     if (widget.isCreated) {
       if (isClosed) {
-        return FButton(onPress: () {}, label: const Text("Open Stack"));
+        return FButton(
+          onPress: () async {
+            Style.showLoadingDialog(context: context);
+            var res = await Database().openStack(widget.stack.id);
+            Navigator.pop(context);
+            res.when(
+              (success) {
+                if (widget.isCreated) {
+                  homeStore.updateCreatedStack(widget.stack.id, success);
+                } else {
+                  homeStore.updateJoinedStack(widget.stack.id, success);
+                }
+                //Navigator.pop(context);
+                Style.showToast(
+                  context: context,
+                  text:
+                      "Succesfull. Kindly go back and load this screen again.",
+                  long: true,
+                );
+              },
+              (error) => Style.showToast(context: context, text: error),
+            );
+          },
+          label: const Text("Open Stack"),
+        );
       }
       return FButton(
-        onPress: () {},
+        onPress: () async {
+          Style.showLoadingDialog(context: context);
+          var res = await Database().closeStack(widget.stack.id);
+          Navigator.pop(context);
+          res.when(
+            (success) {
+              if (widget.isCreated) {
+                homeStore.updateCreatedStack(widget.stack.id, success);
+              } else {
+                homeStore.updateJoinedStack(widget.stack.id, success);
+              }
+              //Navigator.pop(context);
+              Style.showToast(
+                context: context,
+                text: "Succesfull. Kindly go back and load this screen again.",
+                long: true,
+              );
+            },
+            (error) => Style.showToast(context: context, text: error),
+          );
+        },
         label: const Text("Close Stack"),
         style: FButtonStyle.destructive,
       );
@@ -159,7 +203,7 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
 
   Widget _buildOperation() {
     if (isClosed) {
-      return Text("Open Stack to start operating");
+      return const Text("Open Stack to start operating");
     }
     return SizedBox(
       width: double.infinity,

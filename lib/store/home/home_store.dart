@@ -50,6 +50,22 @@ abstract class _HomeStoreBase with Store {
   }
 
   @action
+  void updateCreatedStack(String stackId, StackModel s) {
+    int index = createdStacks.indexWhere(
+      (element) => element.id == stackId,
+    );
+    createdStacks[index] = s;
+  }
+
+  @action
+  void updateJoinedStack(String stackId, StackModel s) {
+    int index = joinedStacks.indexWhere(
+      (element) => element.id == stackId,
+    );
+    joinedStacks[index] = s;
+  }
+
+  @action
   void refresh() {
     fetchCreatedStacks();
     fetchJoinedStacks();

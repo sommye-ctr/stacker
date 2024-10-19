@@ -162,4 +162,32 @@ class Database {
       return Error(e.toString());
     }
   }
+
+  Future<Result<StackModel, String>> openStack(String stackId) async {
+    try {
+      var resp = await supabase
+          .from("stacks")
+          .update({"status": "Open"})
+          .eq('id', stackId)
+          .select()
+          .single();
+      return Success(StackModel.fromMap(resp));
+    } catch (e) {
+      return Error(e.toString());
+    }
+  }
+
+  Future<Result<StackModel, String>> closeStack(String stackId) async {
+    try {
+      var resp = await supabase
+          .from("stacks")
+          .update({"status": "Closed"})
+          .eq('id', stackId)
+          .select()
+          .single();
+      return Success(StackModel.fromMap(resp));
+    } catch (e) {
+      return Error(e.toString());
+    }
+  }
 }

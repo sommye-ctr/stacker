@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class Style {
-  static const Color primaryColor = Color(0xFF57CC99);
+  static const Color primaryColor = Color.fromRGBO(87, 204, 153, 1);
   static const double stackTileImageRatio = 16 / 9;
 
   static void showLoadingDialog({

@@ -57,7 +57,8 @@ class Database {
       final res = await supabase
           .from("booking")
           .select('*, stacks!inner(*)')
-          .eq('user_id', supabase.auth.currentUser!.id);
+          .eq('user_id', supabase.auth.currentUser!.id)
+          .eq('status', 'Active');
 
       return Success((res as List).map((e) => Booking.fromMap(e)).toList());
     } on PostgrestException catch (e) {

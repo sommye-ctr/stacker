@@ -1,6 +1,6 @@
 ## Stacker
 Save your time
-![alt text]('Stacker%20(1).png')
+![alt text]('Stacker.png')
 
 
 The project is of a flutter app - having backend as postgres (using supabase).

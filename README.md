@@ -11,3 +11,5 @@ The schema of database is:
 To build the project:
 - Clone the project
 - Follow this link for detailed steps - [link](https://docs.flutter.dev/deployment/android)
+
+- The apk of the app is in the root directory of the repo

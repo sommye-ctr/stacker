@@ -6,7 +6,7 @@ The project is of a flutter app - having backend as postgres (using supabase).
 
 
 The schema of database is:
-![alt text]('https://imgur.com/oOKYyMi')
+![alt text]('https://iili.io/23YXZiv.png')
 
 To build the project:
 - Clone the project

@@ -28,7 +28,7 @@ class DateHelper {
   }
 
   static TimeOfDay convertIso8601ToTimeOfDay(String s) {
-    DateTime dateTime = DateTime.parse(s).toLocal();
+    DateTime dateTime = DateTime.parse(s);
     return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
   }
 }

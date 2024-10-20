@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:stacker/resources/style.dart';
-import 'package:stacker/services/database.dart';
 import 'package:stacker/widgets/spacing.dart';
 
 class InputTokenDialog extends StatefulWidget {
@@ -44,7 +42,7 @@ class _InputTokenDialogState extends State<InputTokenDialog> {
                 children: [
                   Expanded(
                     child: FButton(
-                      onPress: () => Navigator.pop(context),
+                      onPress: () => Navigator.pop(context, 0),
                       label: const Text("Cancel"),
                     ),
                   ),
@@ -52,7 +50,7 @@ class _InputTokenDialogState extends State<InputTokenDialog> {
                   Expanded(
                     child: FButton(
                       onPress: () async {
-                        int token = int.parse(controller.text);
+                        /* int token = int.parse(controller.text);
                         Style.showLoadingDialog(context: context);
                         var res = await Database()
                             .setCurrentToken(widget.stackId, token);
@@ -64,7 +62,9 @@ class _InputTokenDialogState extends State<InputTokenDialog> {
                           },
                           (error) =>
                               Style.showToast(context: context, text: error),
-                        );
+                        ); */
+                        int token = int.parse(controller.text);
+                        Navigator.pop(context, token);
                       },
                       label: const Text("Enter"),
                     ),

@@ -204,6 +204,23 @@ class Database {
           .from("stacks")
           .update({"current_token": token}).eq('id', stackId);
 
+      // ignore: void_checks
+      return const Success(Void);
+    } catch (e) {
+      return Error(e.toString());
+    }
+  }
+
+  Future<Result<void, String>> markTokenAsDone(
+      String stackId, int token) async {
+    try {
+      await supabase
+          .from("booking")
+          .update({"status": "Completed"})
+          .eq('stack_id', stackId)
+          .eq('token', token);
+
+      // ignore: void_checks
       return const Success(Void);
     } catch (e) {
       return Error(e.toString());

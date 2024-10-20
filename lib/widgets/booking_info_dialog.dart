@@ -6,14 +6,20 @@ import 'package:stacker/services/database.dart';
 import 'package:stacker/utils/date_helper.dart';
 import 'package:stacker/widgets/spacing.dart';
 
-class BookingInfoDialog extends StatelessWidget {
+class BookingInfoDialog extends StatefulWidget {
   final Map<String, dynamic> map;
   const BookingInfoDialog({super.key, required this.map});
 
   @override
-  Widget build(BuildContext context) {
-    TimeOfDay t = DateHelper.convertIso8601ToTimeOfDay(map['time_arrival']);
+  State<BookingInfoDialog> createState() => _BookingInfoDialogState();
+}
 
+class _BookingInfoDialogState extends State<BookingInfoDialog> {
+  late TimeOfDay t =
+      DateHelper.convertIso8601ToTimeOfDay(widget.map['time_arrival']);
+
+  @override
+  Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: context.theme.cardStyle.decoration.borderRadius!,
@@ -25,7 +31,7 @@ class BookingInfoDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "#${map['token']}",
+                "#${widget.map['token']}",
                 style: context.theme.typography.xl2,
               ),
               const Spacing(),
@@ -47,14 +53,14 @@ class BookingInfoDialog extends StatelessWidget {
                     child: FButton(
                       onPress: () async {
                         Style.showLoadingDialog(context: context);
-                        var resp = await Database().proceedBooking(map);
+                        var resp = await Database().proceedBooking(widget.map);
                         Navigator.pop(context);
 
                         resp.when(
                           (success) {
                             Style.showToast(
                                 context: context, text: "Booked succesfully");
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           },
                           (error) => Style.showToast(
                             context: context,

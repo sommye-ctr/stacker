@@ -230,33 +230,65 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
               const Spacing(),
               if (stack.currentToken != 0)
                 FButton(
-                  onPress: () {},
+                  onPress: () async {
+                    int token = await _showInputTokenDialog();
+                    if (token == 0) return;
+                    Style.showLoadingDialog(context: context);
+                    var resp = await Database()
+                        .markTokenAsDone(stack.id, stack.currentToken);
+                    Navigator.pop(context);
+                    resp.whenError(
+                      (error) => Style.showToast(context: context, text: error),
+                    );
+                    resp.whenSuccess(
+                      (success) {
+                        _updateCurrentToken(token);
+                      },
+                    );
+                  },
                   label: const Text("Mark this token as done"),
                   style: FButtonStyle.outline,
                 ),
               const Spacing(),
-              FButton(
-                onPress: () async {
-                  var resp = await showAdaptiveDialog(
-                    context: context,
-                    builder: (context) {
-                      return InputTokenDialog(
-                        stackId: stack.id,
-                      );
-                    },
-                  );
-
-                  if (resp != null) {
-                    homeStore.updateTokenOfStack(stack.id, resp);
-                  }
-                },
-                label: const Text("Input token number"),
-                style: FButtonStyle.secondary,
-              )
+              if (stack.currentToken == 0)
+                FButton(
+                  onPress: () async {
+                    int token = await _showInputTokenDialog();
+                    if (token != 0) _updateCurrentToken(token);
+                  },
+                  label: const Text("Input token number"),
+                  style: FButtonStyle.secondary,
+                )
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Future<int> _showInputTokenDialog() async {
+    return await showAdaptiveDialog(
+      context: context,
+      builder: (context) {
+        return InputTokenDialog(
+          stackId: stack.id,
+        );
+      },
+    );
+  }
+
+  void _updateCurrentToken(int token) async {
+    Style.showLoadingDialog(context: context);
+    var res = await Database().setCurrentToken(stack.id, token);
+
+    Navigator.pop(context);
+    res.when(
+      (success) {
+        homeStore.updateTokenOfStack(stack.id, token);
+        homeStore.refresh();
+        Navigator.pop(context);
+      },
+      (error) => Style.showToast(context: context, text: error),
     );
   }
 
@@ -367,11 +399,16 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
     Navigator.pop(context);
 
     resp.when(
-      (success) {
-        showAdaptiveDialog(
+      (success) async {
+        var result = await showAdaptiveDialog(
           context: context,
           builder: (context) => BookingInfoDialog(map: success),
         );
+
+        if (result != null && result) {
+          homeStore.refresh();
+          Navigator.pop(context);
+        }
       },
       (error) => Style.showToast(context: context, text: error, long: true),
     );

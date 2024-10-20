@@ -199,6 +199,9 @@ class Database {
       if (resp.isEmpty) {
         return const Error("Token does not exist");
       }
+      if (resp.first['status'] == 'Completed') {
+        return const Error("Booking is already completed");
+      }
 
       await supabase
           .from("stacks")

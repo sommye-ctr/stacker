@@ -84,6 +84,10 @@ class StackModel {
     );
   }
 
+  void updateToken(int token) {
+    currentToken = token;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

@@ -18,6 +18,8 @@ abstract class _HomeStoreBase with Store {
   @observable
   String? error;
 
+  int? selectedIndex;
+
   @action
   void fetchCreatedStacks() async {
     createdStacks.clear();
@@ -63,6 +65,14 @@ abstract class _HomeStoreBase with Store {
       (element) => element.id == stackId,
     );
     joinedStacks[index] = s;
+  }
+
+  @action
+  void updateTokenOfStack(String id, int token) {
+    int index = createdStacks.indexWhere(
+      (element) => element.id == id,
+    );
+    createdStacks[index].updateToken(token);
   }
 
   @action

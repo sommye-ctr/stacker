@@ -13,6 +13,7 @@ import 'package:stacker/utils/date_helper.dart';
 import 'package:stacker/utils/location_helper.dart';
 import 'package:stacker/utils/screen_size.dart';
 import 'package:stacker/widgets/booking_info_dialog.dart';
+import 'package:stacker/widgets/input_token_dialog.dart';
 import 'package:stacker/widgets/rounded_image.dart';
 import 'package:stacker/widgets/spacing.dart';
 
@@ -22,9 +23,7 @@ class StackDetailsScreen extends StatefulWidget {
   static const String route = "/stack-details";
 
   final bool isCreated;
-  final StackModel stack;
-  const StackDetailsScreen(
-      {super.key, required this.stack, required this.isCreated});
+  const StackDetailsScreen({super.key, required this.isCreated});
 
   @override
   State<StackDetailsScreen> createState() => _StackDetailsScreenState();
@@ -33,12 +32,18 @@ class StackDetailsScreen extends StatefulWidget {
 class _StackDetailsScreenState extends State<StackDetailsScreen> {
   late HomeStore homeStore;
   late bool isClosed;
+  late StackModel stack;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     homeStore = Provider.of<HomeStore>(context);
-    isClosed = widget.stack.status == Strings.closed;
+    if (widget.isCreated) {
+      stack = homeStore.createdStacks[homeStore.selectedIndex!];
+    } else {
+      stack = homeStore.joinedStacks[homeStore.selectedIndex!];
+    }
+    isClosed = stack.status == Strings.closed;
   }
 
   @override
@@ -55,9 +60,9 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
                 Stack(
                   children: [
                     Hero(
-                      tag: widget.stack.id,
+                      tag: stack.id,
                       child: RoundedImage(
-                        image: widget.stack.image,
+                        image: stack.image,
                         width: ScreenSize.getPercentOfWidth(context, 1),
                         ratio: Style.stackTileImageRatio,
                       ),
@@ -68,13 +73,13 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      widget.stack.name,
+                      stack.name,
                       style: context.theme.typography.xl3
                           .copyWith(fontWeight: FontWeight.w500),
                     ),
                     const Spacing(),
                     FBadge(
-                      label: Text(widget.stack.status),
+                      label: Text(stack.status),
                       style: isClosed
                           ? FBadgeStyle.destructive
                           : FBadgeStyle.primary,
@@ -138,14 +143,14 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
         return FButton(
           onPress: () async {
             Style.showLoadingDialog(context: context);
-            var res = await Database().openStack(widget.stack.id);
+            var res = await Database().openStack(stack.id);
             Navigator.pop(context);
             res.when(
               (success) {
                 if (widget.isCreated) {
-                  homeStore.updateCreatedStack(widget.stack.id, success);
+                  homeStore.updateCreatedStack(stack.id, success);
                 } else {
-                  homeStore.updateJoinedStack(widget.stack.id, success);
+                  homeStore.updateJoinedStack(stack.id, success);
                 }
                 //Navigator.pop(context);
                 Style.showToast(
@@ -164,14 +169,14 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
       return FButton(
         onPress: () async {
           Style.showLoadingDialog(context: context);
-          var res = await Database().closeStack(widget.stack.id);
+          var res = await Database().closeStack(stack.id);
           Navigator.pop(context);
           res.when(
             (success) {
               if (widget.isCreated) {
-                homeStore.updateCreatedStack(widget.stack.id, success);
+                homeStore.updateCreatedStack(stack.id, success);
               } else {
-                homeStore.updateJoinedStack(widget.stack.id, success);
+                homeStore.updateJoinedStack(stack.id, success);
               }
               //Navigator.pop(context);
               Style.showToast(
@@ -213,7 +218,7 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "#${widget.stack.currentToken}",
+                "#${stack.currentToken}",
                 style: context.theme.typography.xl5
                     .copyWith(fontWeight: FontWeight.bold),
               ),
@@ -223,10 +228,30 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
                 style: context.theme.typography.sm,
               ),
               const Spacing(),
+              if (stack.currentToken != 0)
+                FButton(
+                  onPress: () {},
+                  label: const Text("Mark this token as done"),
+                  style: FButtonStyle.outline,
+                ),
+              const Spacing(),
               FButton(
-                onPress: () {},
-                label: const Text("Mark this token as done"),
-                style: FButtonStyle.outline,
+                onPress: () async {
+                  var resp = await showAdaptiveDialog(
+                    context: context,
+                    builder: (context) {
+                      return InputTokenDialog(
+                        stackId: stack.id,
+                      );
+                    },
+                  );
+
+                  if (resp != null) {
+                    homeStore.updateTokenOfStack(stack.id, resp);
+                  }
+                },
+                label: const Text("Input token number"),
+                style: FButtonStyle.secondary,
               )
             ],
           ),
@@ -240,15 +265,15 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
       items: [
         FAccordionItem(
           title: const Text(Strings.currentToken),
-          child: Text(widget.stack.currentToken.toString()),
+          child: Text(stack.currentToken.toString()),
         ),
         FAccordionItem(
           title: const Text(Strings.timing),
           child: Text(
             DateHelper.convertTimeRangeString(
               TimeRangeValue.value(
-                startTime: widget.stack.openTime,
-                endTime: widget.stack.closeTime,
+                startTime: stack.openTime,
+                endTime: stack.closeTime,
               ),
             ),
           ),
@@ -258,22 +283,22 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(widget.stack.address1),
-              if (widget.stack.address2.isNotEmpty) Text(widget.stack.address2),
-              if (widget.stack.city.isNotEmpty) Text(widget.stack.city),
+              Text(stack.address1),
+              if (stack.address2.isNotEmpty) Text(stack.address2),
+              if (stack.city.isNotEmpty) Text(stack.city),
               const Spacing(),
               FButton(
                 onPress: () {
-                  if (widget.stack.latitude != 0) {
+                  if (stack.latitude != 0) {
                     LocationHelper.openMaps(
-                      lat: widget.stack.latitude,
-                      long: widget.stack.longitude,
+                      lat: stack.latitude,
+                      long: stack.longitude,
                     );
                     return;
                   }
                   LocationHelper.openMaps(
                       query:
-                          "${widget.stack.address1} ${widget.stack.address2} ${widget.stack.city}");
+                          "${stack.address1} ${stack.address2} ${stack.city}");
                 },
                 label: const Text(Strings.openMaps),
                 style: FButtonStyle.outline,
@@ -283,18 +308,18 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
         ),
         FAccordionItem(
           title: const Text(Strings.description),
-          child: Text(widget.stack.desc),
+          child: Text(stack.desc),
         ),
         FAccordionItem(
           title: const Text(Strings.ownerDetails),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("${Strings.name} - ${widget.stack.userName}"),
-              if (widget.stack.userEmail.isNotEmpty)
-                Text("${Strings.email} - ${widget.stack.userEmail}"),
-              if (widget.stack.userPhone.isNotEmpty)
-                Text("${Strings.phoneNumber} - ${widget.stack.userPhone}"),
+              Text("${Strings.name} - ${stack.userName}"),
+              if (stack.userEmail.isNotEmpty)
+                Text("${Strings.email} - ${stack.userEmail}"),
+              if (stack.userPhone.isNotEmpty)
+                Text("${Strings.phoneNumber} - ${stack.userPhone}"),
             ],
           ),
         ),
@@ -309,12 +334,12 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Stack ID - ${widget.stack.shortId}"),
+              Text("Stack ID - ${stack.shortId}"),
               const Spacing(),
               FButton.icon(
                 onPress: () async {
-                  var res = await ClipboardHelper.copyToClipboard(
-                      widget.stack.shortId);
+                  var res =
+                      await ClipboardHelper.copyToClipboard(stack.shortId);
                   if (res) {
                     Style.showToast(
                         context: context, text: "Copied to clipboard");
@@ -336,8 +361,8 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
   void _bookNow() async {
     Database database = Database();
     Style.showLoadingDialog(context: context);
-    var resp = await database.getBookingDetails(
-        LocalService.getUserId(), widget.stack.id);
+    var resp =
+        await database.getBookingDetails(LocalService.getUserId(), stack.id);
 
     Navigator.pop(context);
 
@@ -354,7 +379,7 @@ class _StackDetailsScreenState extends State<StackDetailsScreen> {
 
   bool _checkIfAlrBooked() {
     for (var element in homeStore.bookings) {
-      if (element.stackId == widget.stack.id) return true;
+      if (element.stackId == stack.id) return true;
     }
     return false;
   }

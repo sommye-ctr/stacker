@@ -191,4 +191,22 @@ class Database {
       return Error(e.toString());
     }
   }
+
+  Future<Result<void, String>> setCurrentToken(
+      String stackId, int token) async {
+    try {
+      var resp = await supabase.from("booking").select().eq('token', token);
+      if (resp.isEmpty) {
+        return const Error("Token does not exist");
+      }
+
+      await supabase
+          .from("stacks")
+          .update({"current_token": token}).eq('id', stackId);
+
+      return const Success(Void);
+    } catch (e) {
+      return Error(e.toString());
+    }
+  }
 }

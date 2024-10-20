@@ -63,8 +63,7 @@ class MyApp extends StatelessWidget {
       case StackDetailsScreen.route:
         return MaterialPageRoute(
           builder: (context) => StackDetailsScreen(
-            stack: settings.arguments['model'],
-            isCreated: settings.arguments['created'],
+            isCreated: settings.arguments,
           ),
         );
       case CreateStackScreen.route:

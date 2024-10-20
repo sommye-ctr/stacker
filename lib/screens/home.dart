@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 tag: s.id,
                 child: HomeStackTile(
                   stack: s,
-                  onClick: () => _onStackClicked(s, false),
+                  onClick: () => _onStackClicked(s, false, index),
                 ),
               );
             },
@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 tag: s.id,
                 child: HomeStackTile(
                   stack: s,
-                  onClick: () => _onStackClicked(s, true),
+                  onClick: () => _onStackClicked(s, true, index),
                 ),
               );
             },
@@ -137,9 +137,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _onStackClicked(StackModel s, bool created) {
-    Navigator.pushNamed(context, StackDetailsScreen.route,
-        arguments: {'model': s, 'created': created});
+  void _onStackClicked(StackModel s, bool created, int index) {
+    homeStore.selectedIndex = index;
+    Navigator.pushNamed(context, StackDetailsScreen.route, arguments: created);
   }
 
   void _onPlusClicked(BuildContext context) {

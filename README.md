@@ -1,5 +1,6 @@
 ## Stacker
 Save your time
+![alt]('https://raw.githubusercontent.com/sommye-ctr/stacker/refs/heads/main/Stacker.png')
 
 
 The project is of a flutter app - having backend as postgres (using supabase).

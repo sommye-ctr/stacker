@@ -2,6 +2,8 @@
 Save your time
 ![alt]('https://raw.githubusercontent.com/sommye-ctr/stacker/refs/heads/main/Stacker.png')
 
+[Devfolio Page](https://devfolio.co/projects/stacker-4046)
+
 In places like small barbershops, beauty parlors, and OPD clinics, people often have to sit and wait for a long time to get their turn. The situation becomes even more chaotic during rush hours and festivals.
 
 We introduce Stacker—an app for booking appointments. Any user on the app can create a "stack," which represents an entity or shop on the app. It can take bookings from other users who join the stack. The app assigns a token to the user and, based on the average duration of one booking (provided by the creator of the stack), suggests a time when the least amount of crowd is expected. This essentially digitizes the token system commonly used by OPD clinics and creates a standardized way for other service-based businesses (like barbershops and boutiques) to take bookings uniformly, reducing chaos in shops.
